@@ -1,18 +1,49 @@
 ﻿using OxyPlot;
 using OxyPlot.Axes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Input;
 using WpfBase;
 using WpfOxyPlotGraph.Commons;
 using WpfOxyPlotGraph.Models;
+using WpfOxyPlotGraph.Views;
+using WpfOxyPlotGraph.WpfBase;
 
 namespace WpfOxyPlotGraph.ViewModels
 {
-  public class MainViewModel : ViewModelBase
+    public class MainViewModel : ViewModelBase
   {
-    Func<TestScore, int> GetScoreFunc(string subject)
+        private readonly INavigationService _navigationService;
+        public ICommand LoadOxyPlotCommand => new RelayCommand<string>(LoadOxyPlot);
+        public ICommand NavigateToDashboardCommand { get; }
+        public ICommand InputScoreCommand { get; }
+        public ICommand ViewStudentsCommand { get; }
+        
+        public MainViewModel(INavigationService navigationService)
+        {
+            _navigationService = navigationService;
+            InputScoreCommand = new RelayCommand(ExecuteInputScore);    
+            NavigateToDashboardCommand = new RelayCommand(NavigateToInitialPage);
+            ViewStudentsCommand = new RelayCommand(ExecuteViewStudents);
+        }
+
+
+        private void ExecuteInputScore()
+        {
+           _navigationService.NavigateTo<InputScoreView>();
+        }
+        private void ExecuteViewStudents()
+        {
+           _navigationService.NavigateTo<StudentsListView>();
+        }
+        public void NavigateToInitialPage()
+        {
+            _navigationService.NavigateTo<MainPage>();
+        }
+
+
+        // 또는 ICommand를 사용하여 네비게이션
+
+
+        Func<TestScore, int> GetScoreFunc(string subject)
     {
       switch (subject)
       {
@@ -71,6 +102,5 @@ namespace WpfOxyPlotGraph.ViewModels
     }
 
     public PlotModel PlotModel { get; set; } = default!;
-    public ICommand LoadOxyPlotCommand => new RelayCommand<string>(LoadOxyPlot);
   }
 }
