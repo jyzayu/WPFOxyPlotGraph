@@ -13,8 +13,9 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Margin="8">
             <Button Content="Home" Command="{Binding NavigateToDashboardCommand}" Margin="0,0,8,0" />
-            <Button Content="성적 입력" Command="{Binding InputScoreCommand}"  />
-            <Button Content="성적 조회" Command="{Binding ViewStudentsCommand}" Margin="8,0,0,0" />
+            <Button Content="신규 환자 등록" Command="{Binding InputScoreCommand}"  />
+            <Button Content="환자 관리" Command="{Binding ViewStudentsCommand}" Margin="8,0,0,0" />
+            <Button Content="예약 관리" Command="{Binding ManageAppointmentsCommand}" Margin="8,0,0,0" />
         </StackPanel>
         <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden" />
     </Grid>

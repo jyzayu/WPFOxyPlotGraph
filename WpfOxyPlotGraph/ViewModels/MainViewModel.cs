@@ -16,6 +16,7 @@ namespace WpfOxyPlotGraph.ViewModels
         public ICommand NavigateToDashboardCommand { get; }
         public ICommand InputScoreCommand { get; }
         public ICommand ViewStudentsCommand { get; }
+        public ICommand ManageAppointmentsCommand { get; }
         
         public MainViewModel(INavigationService navigationService)
         {
@@ -23,17 +24,22 @@ namespace WpfOxyPlotGraph.ViewModels
             InputScoreCommand = new RelayCommand(ExecuteInputScore);    
             NavigateToDashboardCommand = new RelayCommand(NavigateToInitialPage);
             ViewStudentsCommand = new RelayCommand(ExecuteViewStudents);
+            ManageAppointmentsCommand = new RelayCommand(ExecuteManageAppointments);
         }
 
 
-        private void ExecuteInputScore()
-        {
-           _navigationService.NavigateTo<InputScoreView>();
-        }
-        private void ExecuteViewStudents()
-        {
-           _navigationService.NavigateTo<StudentsListView>();
-        }
+    private void ExecuteInputScore()
+    {
+           _navigationService.NavigateTo<RegisterPatientView>();
+    }
+    private void ExecuteViewStudents()
+    {
+           _navigationService.NavigateTo<PatientsListView>();
+    }
+    private void ExecuteManageAppointments()
+    {
+           _navigationService.NavigateTo<AppointmentsView>();
+    }
         public void NavigateToInitialPage()
         {
             _navigationService.NavigateTo<MainPage>();

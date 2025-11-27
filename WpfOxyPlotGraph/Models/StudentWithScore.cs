@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualBasic;
-using MySql.Data.MySqlClient;
+using Oracle.ManagedDataAccess.Client;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -48,10 +48,10 @@ namespace WpfOxyPlotGraph.Models
 
             return _joinedData;
         }
-        //임의 데이터를 생성하는 것이 아닌 mysql하고 연동하고 학생 데이터를 조회해서 가져오도록 구현
+        //임의 데이터를 생성하는 것이 아닌 Oracle DB 하고 연동하고 학생 데이터를 조회해서 가져오도록 구현
         public static IEnumerable<StudentWithScore> GetDatasFromDb()
         {
-            using (var connection = new MySqlConnection("Server=localhost;Database=mydatabase;Uid=root;Pwd=password;"))
+            using (var connection = new OracleConnection("User Id=hr;Password=hr;Data Source=localhost:1521/XEPDB1;"))
             {
                 connection.Open();
                 var command = connection.CreateCommand();
