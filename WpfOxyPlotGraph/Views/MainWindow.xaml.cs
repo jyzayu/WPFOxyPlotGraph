@@ -32,7 +32,7 @@ namespace WpfOxyPlotGraph.Views
             DataContext = new MainViewModel(navigationService);
 
             // MainWindow 생성 직후 MainPage로 네비게이션
-            navigationService.NavigateTo<MainPage>();
+            navigationService.NavigateTo<PatientsListView>();
         }
 
         public void Home_Click(object sender, RoutedEventArgs e)
