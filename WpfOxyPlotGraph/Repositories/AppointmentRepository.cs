@@ -42,6 +42,18 @@ namespace WpfOxyPlotGraph.Repositories
             }
         }
 
+        public IEnumerable<string> GetDistinctDoctorNames()
+        {
+            using var connection = DbConnectionFactory.CreateOpenConnection();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = @"SELECT DISTINCT doctor_name FROM appointments ORDER BY doctor_name";
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                yield return reader.GetString(0);
+            }
+        }
+
         public IEnumerable<Appointment> GetByPatientId(int patientId)
         {
             using var connection = DbConnectionFactory.CreateOpenConnection();

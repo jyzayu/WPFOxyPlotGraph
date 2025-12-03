@@ -38,7 +38,7 @@
         <!-- Patient selector -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,10">
           <Label Content="환자 선택"/>
-          <ComboBox Width="350"
+          <ComboBox Width="280"
                     ItemsSource="{Binding Patients}"
                     SelectedItem="{Binding SelectedPatient, Mode=TwoWay}"
                     DisplayMemberPath="Name"/>
@@ -87,7 +87,7 @@
 
           <Label Grid.Row="1" Grid.Column="0" Content="예약시간"/>
           <ComboBox Grid.Row="1" Grid.Column="1"
-                    Width="180"
+                    
                     ItemsSource="{Binding AvailableTimeSlots}"
                     SelectedItem="{Binding SelectedTimeSlot, Mode=TwoWay}" />
 
