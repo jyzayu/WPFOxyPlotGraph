@@ -40,7 +40,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.Parameters.Add(new OracleParameter("contact", patient.Contact));
             var idParam = new OracleParameter("idOut", OracleDbType.Int32) { Direction = System.Data.ParameterDirection.Output };
             cmd.Parameters.Add(idParam);
-            //Oracle.ManagedDataAccess.Client.OracleException: 'ORA-00001: ¹«°á¼º Á¦¾à Á¶°Ç(SYSTEM.UQ_PATIENTS_RRN)¿¡ À§¹èµË´Ï´Ù'
+            //Oracle.ManagedDataAccess.Client.OracleException: 'ORA-00001: ï¿½ï¿½ï¿½á¼º ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(SYSTEM.UQ_PATIENTS_RRN)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ë´Ï´ï¿½'
             //cmd.ExecuteNonQuery();
             try
             {
@@ -78,6 +78,26 @@ namespace WpfOxyPlotGraph.Repositories
                     Address = reader.GetString(3),
                     Contact = reader.GetString(4),
                 };
+            }
+        }
+
+        public void Update(Patient patient)
+        {
+            using var connection = DbConnectionFactory.CreateOpenConnection();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE patients SET name = :name, rrn = :rrn, address = :address, contact = :contact, updated_at = CURRENT_TIMESTAMP WHERE id = :id";
+            cmd.Parameters.Add(new OracleParameter("name", patient.Name));
+            cmd.Parameters.Add(new OracleParameter("rrn", patient.ResidentRegistrationNumber));
+            cmd.Parameters.Add(new OracleParameter("address", patient.Address));
+            cmd.Parameters.Add(new OracleParameter("contact", patient.Contact));
+            cmd.Parameters.Add(new OracleParameter("id", patient.Id));
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (OracleException ex) when (ex.Number == 1)
+            {
+                throw new System.Exception("A patient with the same Resident Registration Number already exists.", ex);
             }
         }
     }

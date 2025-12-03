@@ -48,6 +48,30 @@ namespace WpfOxyPlotGraph.ViewModels
         Visits.Add(v);
       }
     }
+
+    public void UpdatePatient(Patient updated)
+    {
+      if (updated == null) return;
+
+      _patientRepository.Update(updated);
+
+      // Replace the item in the collection to ensure UI refresh
+      Patient existing = Patients.FirstOrDefault(p => p.Id == updated.Id);
+      if (existing != null)
+      {
+        int index = Patients.IndexOf(existing);
+        var newItem = new Patient
+        {
+          Id = updated.Id,
+          Name = updated.Name,
+          ResidentRegistrationNumber = updated.ResidentRegistrationNumber,
+          Address = updated.Address,
+          Contact = updated.Contact
+        };
+        Patients[index] = newItem;
+        SelectedPatient = newItem;
+      }
+    }
   }
 }
 

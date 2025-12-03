@@ -37,6 +37,13 @@
         <DataGridTextColumn Header="주민등록번호" Binding="{Binding ResidentRegistrationNumber}" Width="220"/>
         <DataGridTextColumn Header="주소" Binding="{Binding Address}" Width="2*"/>
         <DataGridTextColumn Header="연락처" Binding="{Binding Contact}" Width="180"/>
+        <DataGridTemplateColumn Header="수정" Width="100">
+          <DataGridTemplateColumn.CellTemplate>
+            <DataTemplate>
+              <Button Content="수정" Click="OnEditRowClick"/>
+            </DataTemplate>
+          </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
       </DataGrid.Columns>
     </DataGrid>
 
