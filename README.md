@@ -1,13 +1,16 @@
 병원 관리 앱(C#, WPF)
 <img width="1068" height="589" alt="image" src="https://github.com/user-attachments/assets/3b65b955-d040-4711-a734-4bddab3a15a6" />
 
-<img width="1061" height="596" alt="image" src="https://github.com/user-attachments/assets/16fbc499-a0f9-4382-8a15-4bdc6a8b103d" />
+<img width="1917" height="1016" alt="image" src="https://github.com/user-attachments/assets/487e0da8-8b11-4086-8c37-653da4166726" />
+
+
 
 <img width="1073" height="576" alt="image" src="https://github.com/user-attachments/assets/9cf288aa-e149-43f2-b86e-668a524956bd" />
 
 <img width="1063" height="589" alt="image" src="https://github.com/user-attachments/assets/991d776e-5eb6-4885-9332-bcbfed70defa" />
 
-<img width="1063" height="580" alt="image" src="https://github.com/user-attachments/assets/5487c858-8d48-4d0e-986d-c154bae98d4b" />
+
+<img width="882" height="678" alt="image" src="https://github.com/user-attachments/assets/bc73ef75-cbaa-41b5-a6d2-83a5668b427b" />
 
 Page, Frame 이용 Navigation 구현
 
