@@ -49,3 +49,4 @@ namespace WpfOxyPlotGraph.Commons
         public bool CanGoForward => _mainFrame?.CanGoForward ?? false;
     }
 }
+ 

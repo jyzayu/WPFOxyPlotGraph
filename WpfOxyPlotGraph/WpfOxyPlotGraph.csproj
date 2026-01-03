@@ -14,4 +14,11 @@
     <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="WpfOxyPlotGraph\Repositories\" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
 </Project>

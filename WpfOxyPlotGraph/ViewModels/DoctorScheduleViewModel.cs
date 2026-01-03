@@ -77,8 +77,6 @@ namespace WpfOxyPlotGraph.ViewModels
 
         public DoctorScheduleViewModel()
         {
-            _appointmentRepository.EnsureTables();
-            _patientRepository.EnsureTables();
             LoadDoctors();
             LoadPatients();
             RefreshSchedule();

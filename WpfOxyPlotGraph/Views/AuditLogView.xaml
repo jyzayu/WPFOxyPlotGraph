@@ -1,0 +1,33 @@
+<Page x:Class="WpfOxyPlotGraph.Views.AuditLogView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Title="감사 로그">
+  <Grid Margin="12">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+      <Button Content="새로고침" Command="{Binding RefreshCommand}" Margin="0,0,8,0"/>
+      <TextBox Width="160" Margin="0,0,8,0" Text="{Binding TableFilter, UpdateSourceTrigger=PropertyChanged}" ToolTip="TABLE NAME filter (optional)"/>
+      <Button Content="CSV 내보내기" Command="{Binding ExportCsvCommand}"/>
+    </StackPanel>
+    <DataGrid Grid.Row="1" ItemsSource="{Binding Entries}" AutoGenerateColumns="False" IsReadOnly="True">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="ID" Binding="{Binding AuditId}" Width="80" />
+        <DataGridTextColumn Header="테이블" Binding="{Binding TableName}" Width="140" />
+        <DataGridTextColumn Header="작업" Binding="{Binding Operation}" Width="80" />
+        <DataGridTextColumn Header="PK" Binding="{Binding PrimaryKeyId}" Width="80" />
+        <DataGridTextColumn Header="시간" Binding="{Binding ChangedAt}" Width="160" />
+        <DataGridTextColumn Header="사용자" Binding="{Binding ChangedBy}" Width="140" />
+        <DataGridTextColumn Header="이전값" Binding="{Binding OldValues}" Width="*" />
+        <DataGridTextColumn Header="신규값" Binding="{Binding NewValues}" Width="*" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</Page>
+
+

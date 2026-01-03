@@ -6,6 +6,7 @@ using System.Windows.Input;
 using WpfBase;
 using WpfOxyPlotGraph.Models;
 using WpfOxyPlotGraph.WpfBase;
+using MessageBox = System.Windows.MessageBox;
 
 namespace WpfOxyPlotGraph.ViewModels
 {

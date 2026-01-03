@@ -97,9 +97,6 @@ namespace WpfOxyPlotGraph.ViewModels
 
         public AppointmentsViewModel()
         {
-            _patientRepository.EnsureTables();
-            _appointmentRepository.EnsureTables();
-
             var allPatients = _patientRepository.GetAll().OrderBy(p => p.Id);
             Patients = new ObservableCollection<Patient>(allPatients);
         }

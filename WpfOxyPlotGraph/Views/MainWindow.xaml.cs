@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfOxyPlotGraph.Commons;
 using WpfOxyPlotGraph.ViewModels;
+using WpfOxyPlotGraph.Commons.Auth;
 
 namespace WpfOxyPlotGraph.Views
 {
@@ -22,17 +23,30 @@ namespace WpfOxyPlotGraph.Views
     // MainWindow.xaml.cs - 호스트 Window
     public partial class MainWindow : Window
     {
-        NavigationService navigationService = new NavigationService();
+        private readonly INavigationService navigationService;
         public MainWindow()
         {
             InitializeComponent();
 
-            navigationService.MainFrame = MainFrame;
+            var nav = WpfOxyPlotGraph.App.Services.GetService(typeof(INavigationService)) as INavigationService;
+            if (nav is NavigationService navImpl)
+            {
+                navImpl.MainFrame = MainFrame;
+            }
+            navigationService = nav ?? new NavigationService { MainFrame = MainFrame };
 
             DataContext = new MainViewModel(navigationService);
 
             // MainWindow 생성 직후 MainPage로 네비게이션
-            navigationService.NavigateTo<PatientsListView>();
+            var auth = WpfOxyPlotGraph.App.Services.GetService(typeof(AuthService)) as AuthService;
+            if (auth != null && auth.CurrentUser != null)
+            {
+                navigationService.NavigateTo<PatientsListView>();
+            }
+            else
+            {
+                navigationService.NavigateTo<LoginView>();
+            }
         }
 
         public void Home_Click(object sender, RoutedEventArgs e)

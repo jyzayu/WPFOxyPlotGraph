@@ -20,7 +20,6 @@ namespace WpfOxyPlotGraph.ViewModels
 
         public RegisterPatientViewModel()
         {
-            _patientRepository.EnsureTables();
         }
 
         private void Register()

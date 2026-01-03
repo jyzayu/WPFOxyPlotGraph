@@ -1,0 +1,36 @@
+<Page x:Class="WpfOxyPlotGraph.Views.BackupView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Title="백업/복원">
+  <Grid Margin="16">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+      <TextBlock Text="백업 경로:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+      <TextBox Text="{Binding DestinationDirectory}" Width="400" Margin="0,0,8,0"/>
+      <Button Content="찾아보기" Command="{Binding BrowseDestinationCommand}"/>
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Margin="0,0,0,12" Grid.Row="1">
+      <CheckBox Content="암호화 사용(DPAPI)" IsChecked="{Binding Encrypt}" Margin="0,0,16,0"/>
+      <Button Content="수동 백업" Command="{Binding RunBackupCommand}" Width="120"/>
+      <TextBlock Text="{Binding LastResultPath}" Margin="8,0,0,0" VerticalAlignment="Center" />
+    </StackPanel>
+    <GroupBox Header="복원" Grid.Row="2">
+      <StackPanel Margin="8">
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+          <Button Content="시뮬레이션" Command="{Binding SimulateRestoreCommand}" Width="120" />
+          <TextBlock Text="{Binding SimulationReport}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+        </StackPanel>
+        <Button Content="복원 실행" Command="{Binding RunRestoreCommand}" Width="120" />
+      </StackPanel>
+    </GroupBox>
+  </Grid>
+</Page>
+
+

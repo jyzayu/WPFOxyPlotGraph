@@ -1,5 +1,6 @@
 using System.Windows;
 using WpfOxyPlotGraph.Models;
+using MessageBox = System.Windows.MessageBox;
 
 namespace WpfOxyPlotGraph.Views
 {

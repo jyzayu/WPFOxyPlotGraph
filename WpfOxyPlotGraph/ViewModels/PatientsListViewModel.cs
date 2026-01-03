@@ -4,6 +4,8 @@ using WpfOxyPlotGraph.Models;
 using WpfOxyPlotGraph.WpfBase;
 using System.Collections.Generic;
 using WpfOxyPlotGraph.Repositories;
+using WpfOxyPlotGraph.Commons.Audit;
+using System.Threading.Tasks;
 
 namespace WpfOxyPlotGraph.ViewModels
 {
@@ -14,6 +16,7 @@ namespace WpfOxyPlotGraph.ViewModels
 
     private readonly PatientRepository _patientRepository = new PatientRepository();
     private readonly VisitRepository _visitRepository = new VisitRepository();
+    private readonly AuditLogService _auditLogService;
 
     private Patient _selectedPatient;
     public Patient SelectedPatient
@@ -25,13 +28,17 @@ namespace WpfOxyPlotGraph.ViewModels
         _selectedPatient = value;
         OnPropertyChanged(nameof(SelectedPatient));
         LoadVisitsForSelectedPatient();
+        _ = LogViewPatientAsync(_selectedPatient);
       }
     }
 
-    public PatientsListViewModel()
+    public PatientsListViewModel() : this(GetAuditFromServiceProvider())
     {
-      _patientRepository.EnsureTables();
-      _visitRepository.EnsureTables();
+    }
+
+    public PatientsListViewModel(AuditLogService auditLogService)
+    {
+      _auditLogService = auditLogService;
 
       IEnumerable<Patient> allPatients = _patientRepository.GetAll().OrderBy(p => p.Id);
       Patients = new ObservableCollection<Patient>(allPatients);
@@ -53,7 +60,28 @@ namespace WpfOxyPlotGraph.ViewModels
     {
       if (updated == null) return;
 
-      _patientRepository.Update(updated);
+      try
+      {
+        _patientRepository.Update(updated);
+      }
+      catch (System.Exception ex)
+      {
+        _ = _auditLogService.LogAsync(new AuditEvent
+        {
+          Action = "UpdatePatient",
+          PatientId = updated.Id,
+          PatientName = updated.Name,
+          Details = "Patient update failed",
+          User = AuditLogService.GetDefaultUser(),
+          Success = false,
+          ErrorMessage = ex.Message
+        });
+        var notifier = GetNotificationService();
+        notifier.ShowError("환자 정보 저장 중 오류가 발생했습니다.", ex, retry: () =>
+        {
+          _patientRepository.Update(updated);
+        });
+      }
 
       // Replace the item in the collection to ensure UI refresh
       Patient existing = Patients.FirstOrDefault(p => p.Id == updated.Id);
@@ -71,7 +99,52 @@ namespace WpfOxyPlotGraph.ViewModels
         Patients[index] = newItem;
         SelectedPatient = newItem;
       }
+
+      _ = _auditLogService.LogAsync(new AuditEvent
+      {
+        Action = "UpdatePatient",
+        PatientId = updated.Id,
+        PatientName = updated.Name,
+        Details = "Patient record updated",
+        User = AuditLogService.GetDefaultUser(),
+        Success = true
+      });
+    }
+
+    private async Task LogViewPatientAsync(Patient patient)
+    {
+      if (patient == null) return;
+      await _auditLogService.LogAsync(new AuditEvent
+      {
+        Action = "ViewPatient",
+        PatientId = patient.Id,
+        PatientName = patient.Name,
+        Details = "Patient selected in list",
+        User = AuditLogService.GetDefaultUser(),
+        Success = true
+      });
+    }
+
+    private static AuditLogService GetAuditFromServiceProvider()
+    {
+      if (System.Windows.Application.Current is WpfOxyPlotGraph.App app && WpfOxyPlotGraph.App.Services != null)
+      {
+        var svc = WpfOxyPlotGraph.App.Services.GetService(typeof(AuditLogService)) as AuditLogService;
+        if (svc != null) return svc;
+      }
+      return new AuditLogService();
+    }
+
+    private static WpfOxyPlotGraph.Commons.NotificationService GetNotificationService()
+    {
+      if (System.Windows.Application.Current is WpfOxyPlotGraph.App && WpfOxyPlotGraph.App.Services != null)
+      {
+        var svc = WpfOxyPlotGraph.App.Services.GetService(typeof(WpfOxyPlotGraph.Commons.NotificationService)) as WpfOxyPlotGraph.Commons.NotificationService;
+        if (svc != null) return svc;
+      }
+      return new WpfOxyPlotGraph.Commons.NotificationService();
     }
   }
 }
+
 
