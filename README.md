@@ -1,22 +1,20 @@
 병원 관리 앱(C#, WPF)
+<img width="1068" height="589" alt="image" src="https://github.com/user-attachments/assets/3b65b955-d040-4711-a734-4bddab3a15a6" />
 
-<img width="1107" height="733" alt="image" src="https://github.com/user-attachments/assets/7b88b499-6030-49dc-9ffc-5e4dc24656f4" />
+<img width="1917" height="1016" alt="image" src="https://github.com/user-attachments/assets/487e0da8-8b11-4086-8c37-653da4166726" />
+
+
+
+<img width="1073" height="576" alt="image" src="https://github.com/user-attachments/assets/9cf288aa-e149-43f2-b86e-668a524956bd" />
+
+<img width="1063" height="589" alt="image" src="https://github.com/user-attachments/assets/991d776e-5eb6-4885-9332-bcbfed70defa" />
+
+
+<img width="882" height="678" alt="image" src="https://github.com/user-attachments/assets/bc73ef75-cbaa-41b5-a6d2-83a5668b427b" />
 
 Page, Frame 이용 Navigation 구현
 
 학생의 대한 날짜별 점수 데이터를  view에서 oxyplot 라이브러리로 만든 그래프
-
-<img width="878" height="587" alt="image" src="https://github.com/user-attachments/assets/330c577a-de4c-4a7a-87f7-aef4ef1f8a01" />
-
-상적 입력 화면
-
-<img width="879" height="582" alt="image" src="https://github.com/user-attachments/assets/67eb89da-6e3b-4426-8fe7-382ad3564516" />
-
-
-
-성적 조회 화면 (수정 및 삭제 가능) 
-
-<img width="877" height="581" alt="image" src="https://github.com/user-attachments/assets/cda612ae-f9ca-41d0-84e0-a17ef6ace368" />
 
 ## 처방 자동 발주 이메일 알림 설정
 
