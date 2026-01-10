@@ -72,10 +72,6 @@ namespace WpfOxyPlotGraph.Commons.Printing
 
 		public void ShowPrintPreview(FlowDocument document)
 		{
-			var viewer = new DocumentViewer();
-			var paginator = ((IDocumentPaginatorSource)document).DocumentPaginator;
-			viewer.Document = document;
-
 			var window = new WpfOxyPlotGraph.Views.PrintPreviewWindow
 			{
 				Owner = System.Windows.Application.Current?.MainWindow,
