@@ -1,4 +1,4 @@
--- Create stored procedures in API schema with DEFINER's rights
+bb-- Create stored procedures in API schema with DEFINER's rights
 -- Connect as:  CONNECT api/"Api#Pwd1"@XEPDB1
 -- Note: Table access is fully qualified via DATA schema.
 

@@ -5,15 +5,21 @@
 GRANT EXECUTE ON api.patient_insert  TO app;
 GRANT EXECUTE ON api.patient_get_all TO app;
 GRANT EXECUTE ON api.patient_update  TO app;
+GRANT EXECUTE ON api.patient_get_page TO app;
+GRANT EXECUTE ON api.patient_get_page_min TO app;
+GRANT EXECUTE ON api.patient_get_by_id TO app;
+GRANT EXECUTE ON api.patient_search_page_min TO app;
 
 GRANT EXECUTE ON api.encounter_insert  TO app;
 GRANT EXECUTE ON api.encounter_update  TO app;
 GRANT EXECUTE ON api.encounter_get_by_patient TO app;
 GRANT EXECUTE ON api.encounter_get_with_patient_by_rrn_hash TO app;
+GRANT EXECUTE ON api.encounter_get_by_patient_page TO app;
 
 GRANT EXECUTE ON api.visit_insert TO app;
 GRANT EXECUTE ON api.visit_update TO app;
 GRANT EXECUTE ON api.visit_get_by_patient TO app;
+GRANT EXECUTE ON api.visit_get_by_patient_page TO app;
 
 -- Appointments
 GRANT EXECUTE ON api.appointment_get_distinct_doctor_names TO app;
