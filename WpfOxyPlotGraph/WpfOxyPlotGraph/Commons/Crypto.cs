@@ -7,6 +7,7 @@ namespace WpfOxyPlotGraph.Commons
 	public static class Crypto
 	{
 		private static readonly byte[] AppScopeEntropy = Encoding.UTF8.GetBytes("WpfOxyPlotGraph:v1");
+		private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, string> DecryptCache = new System.Collections.Concurrent.ConcurrentDictionary<string, string>(System.StringComparer.Ordinal);
 
 		public static string EncryptString(string plaintext, string purpose)
 		{
@@ -26,10 +27,24 @@ namespace WpfOxyPlotGraph.Commons
 			{
 				return string.Empty;
 			}
+			var cacheKey = purpose + "\n" + ciphertextBase64;
+			if (DecryptCache.TryGetValue(cacheKey, out var cached))
+			{
+				return cached;
+			}
+
 			var cipherBytes = Convert.FromBase64String(ciphertextBase64);
 			var entropy = BuildEntropy(purpose);
 			var plainBytes = ProtectedData.Unprotect(cipherBytes, entropy, DataProtectionScope.LocalMachine);
-			return Encoding.UTF8.GetString(plainBytes);
+			var plain = Encoding.UTF8.GetString(plainBytes);
+
+			// simple cap to avoid unbounded growth
+			if (DecryptCache.Count < 5000)
+			{
+				DecryptCache[cacheKey] = plain;
+			}
+
+			return plain;
 		}
 
 		// Lenient decrypt to ease migration: if value isn't valid base64/encrypted, return as-is
