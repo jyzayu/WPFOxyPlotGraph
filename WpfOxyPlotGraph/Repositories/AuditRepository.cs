@@ -18,7 +18,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.Parameters.Add(new OracleParameter("p_limit", limit));
             cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
 
-            using var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.audit_get_recent");
             while (reader.Read())
             {
                 yield return Map(reader);
@@ -36,7 +36,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.Parameters.Add(new OracleParameter("p_limit", limit));
             cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
 
-            using var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.audit_get_by_table");
             while (reader.Read())
             {
                 yield return Map(reader);

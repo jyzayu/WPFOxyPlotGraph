@@ -25,7 +25,7 @@ namespace WpfOxyPlotGraph.Repositories
 			cmd.Parameters.Add(new OracleParameter("p_quantity", quantity));
 			var idOut = new OracleParameter("p_id_out", OracleDbType.Int32) { Direction = ParameterDirection.Output };
 			cmd.Parameters.Add(idOut);
-			cmd.ExecuteNonQuery();
+			cmd.ExecuteNonQueryTimed(tag: "api.purchase_order_insert_or_increase_pending");
 			return ((Oracle.ManagedDataAccess.Types.OracleDecimal)idOut.Value).ToInt32();
 		}
 
@@ -38,7 +38,7 @@ namespace WpfOxyPlotGraph.Repositories
 			cmd.BindByName = true;
 			cmd.Parameters.Add(new OracleParameter("p_id", id));
 			cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
-			using var reader = cmd.ExecuteReader();
+			using var reader = cmd.ExecuteReaderTimed(tag: "api.purchase_order_get_by_id");
 			if (reader.Read())
 			{
 				return new PurchaseOrder
@@ -63,7 +63,7 @@ namespace WpfOxyPlotGraph.Repositories
 			cmd.BindByName = true;
 			cmd.Parameters.Add(new OracleParameter("p_id", id));
 			cmd.Parameters.Add(new OracleParameter("p_status", status));
-			cmd.ExecuteNonQuery();
+			cmd.ExecuteNonQueryTimed(tag: "api.purchase_order_update_status");
 		}
 	}
 }

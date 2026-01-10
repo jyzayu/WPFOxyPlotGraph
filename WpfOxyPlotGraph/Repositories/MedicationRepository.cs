@@ -23,7 +23,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.BindByName = true;
             cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, System.Data.ParameterDirection.Output);
-            using var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.medication_get_all");
             while (reader.Read())
             {
                 yield return new Medication
@@ -49,7 +49,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.BindByName = true;
             cmd.Parameters.Add(new OracleParameter("p_id", id));
             cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, System.Data.ParameterDirection.Output);
-            using var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.medication_get_by_id");
             if (reader.Read())
             {
                 return new Medication
@@ -81,7 +81,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.Parameters.Add(new OracleParameter("p_reorder_qty", medication.ReorderQuantity));
             var idParam = new OracleParameter("p_id_out", OracleDbType.Int32) { Direction = System.Data.ParameterDirection.Output };
             cmd.Parameters.Add(idParam);
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQueryTimed(tag: "api.medication_insert");
             return ((Oracle.ManagedDataAccess.Types.OracleDecimal)idParam.Value).ToInt32();
         }
 
@@ -98,7 +98,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.Parameters.Add(new OracleParameter("p_min_stock", medication.MinimumStock));
             cmd.Parameters.Add(new OracleParameter("p_reorder_point", medication.ReorderPoint));
             cmd.Parameters.Add(new OracleParameter("p_reorder_qty", medication.ReorderQuantity));
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQueryTimed(tag: "api.medication_update");
         }
     }
 }

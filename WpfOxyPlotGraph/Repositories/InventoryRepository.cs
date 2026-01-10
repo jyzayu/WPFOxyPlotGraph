@@ -22,7 +22,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.Parameters.Add(new OracleParameter("p_medication_id", medicationId));
             cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, System.Data.ParameterDirection.Output);
 
-            using var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.inventory_get_quantity");
             if (reader.Read())
             {
                 if (reader.IsDBNull(0)) return 0;
@@ -41,7 +41,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.BindByName = true;
             cmd.Parameters.Add(new OracleParameter("p_medication_id", medicationId));
             cmd.Parameters.Add(new OracleParameter("p_quantity", quantity));
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQueryTimed(tag: "api.inventory_upsert_quantity");
         }
 
         public void Increase(int medicationId, int delta)
@@ -53,7 +53,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.BindByName = true;
             cmd.Parameters.Add(new OracleParameter("p_medication_id", medicationId));
             cmd.Parameters.Add(new OracleParameter("p_delta", delta));
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQueryTimed(tag: "api.inventory_increase");
         }
 
         public void Decrease(int medicationId, int delta)
@@ -65,7 +65,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.BindByName = true;
             cmd.Parameters.Add(new OracleParameter("p_medication_id", medicationId));
             cmd.Parameters.Add(new OracleParameter("p_delta", delta));
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQueryTimed(tag: "api.inventory_decrease");
         }
     }
 }

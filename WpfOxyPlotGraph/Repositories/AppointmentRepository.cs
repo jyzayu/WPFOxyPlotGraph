@@ -23,7 +23,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.BindByName = true;
             cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, System.Data.ParameterDirection.Output);
 
-            using var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.appointment_get_distinct_doctor_names");
             while (reader.Read())
             {
                 yield return reader.GetString(0);
@@ -39,7 +39,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.BindByName = true;
             cmd.Parameters.Add(new OracleParameter("p_patient_id", patientId));
             cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, System.Data.ParameterDirection.Output);
-            using var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.appointment_get_by_patient");
             while (reader.Read())
             {
                 yield return new Appointment
@@ -67,7 +67,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.Parameters.Add(new OracleParameter("p_doctor_name", doctorName));
             cmd.Parameters.Add(new OracleParameter("p_date", date));
             cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, System.Data.ParameterDirection.Output);
-            using var reader = cmd.ExecuteReader();
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.appointment_get_by_doctor_and_date");
             while (reader.Read())
             {
                 yield return new Appointment
@@ -100,7 +100,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.Parameters.Add(new OracleParameter("p_notes", string.IsNullOrWhiteSpace(appointment.Notes) ? (object)System.DBNull.Value : appointment.Notes));
             var idParam = new OracleParameter("p_id_out", OracleDbType.Int32) { Direction = System.Data.ParameterDirection.Output };
             cmd.Parameters.Add(idParam);
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQueryTimed(tag: "api.appointment_insert");
             //tem.InvalidCastException: 'Unable to cast object of type 'Oracle.ManagedDataAccess.Types.OracleDecimal' to type 'System.IConvertible'.'
             //return System.Convert.ToInt32(idParam.Value);
             return ((Oracle.ManagedDataAccess.Types.OracleDecimal)idParam.Value).ToInt32();
@@ -120,7 +120,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.Parameters.Add(new OracleParameter("p_reason", appointment.Reason));
             cmd.Parameters.Add(new OracleParameter("p_status", string.IsNullOrWhiteSpace(appointment.Status) ? "Scheduled" : appointment.Status));
             cmd.Parameters.Add(new OracleParameter("p_notes", string.IsNullOrWhiteSpace(appointment.Notes) ? (object)System.DBNull.Value : appointment.Notes));
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQueryTimed(tag: "api.appointment_update");
         }
 
         public void Cancel(int appointmentId)
@@ -131,7 +131,7 @@ namespace WpfOxyPlotGraph.Repositories
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.BindByName = true;
             cmd.Parameters.Add(new OracleParameter("p_id", appointmentId));
-            cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQueryTimed(tag: "api.appointment_cancel");
         }
     }
 }

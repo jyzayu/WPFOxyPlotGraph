@@ -18,7 +18,33 @@ namespace WpfOxyPlotGraph.Repositories
 			cmd.Parameters.Add(new OracleParameter("p_patient_id", patientId));
 			cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
 
-			using var reader = cmd.ExecuteReader();
+			using var reader = cmd.ExecuteReaderTimed(tag: "api.encounter_get_by_patient");
+			while (reader.Read())
+			{
+				yield return new Encounter
+				{
+					Id = reader.GetInt32(0),
+					PatientId = reader.GetInt32(1),
+					VisitAt = reader.GetDateTime(2),
+					Diagnosis = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+					Notes = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+				};
+			}
+		}
+
+		public IEnumerable<Encounter> GetByPatientIdPage(int patientId, int offset, int pageSize)
+		{
+			using var connection = DbConnectionFactory.CreateOpenConnection();
+			using var cmd = connection.CreateCommand();
+			cmd.CommandText = "api.encounter_get_by_patient_page";
+			cmd.CommandType = CommandType.StoredProcedure;
+			cmd.BindByName = true;
+			cmd.Parameters.Add(new OracleParameter("p_patient_id", patientId));
+			cmd.Parameters.Add(new OracleParameter("p_offset", offset));
+			cmd.Parameters.Add(new OracleParameter("p_page_size", pageSize));
+			cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
+
+			using var reader = cmd.ExecuteReaderTimed(tag: "api.encounter_get_by_patient_page");
 			while (reader.Read())
 			{
 				yield return new Encounter
@@ -45,7 +71,7 @@ namespace WpfOxyPlotGraph.Repositories
 			cmd.Parameters.Add(new OracleParameter("p_notes", encounter.Notes));
 			var idOut = new OracleParameter("p_id_out", OracleDbType.Int32, ParameterDirection.Output);
 			cmd.Parameters.Add(idOut);
-			cmd.ExecuteNonQuery();
+			cmd.ExecuteNonQueryTimed(tag: "api.encounter_insert");
 			return System.Convert.ToInt32(idOut.Value);
 		}
 
@@ -61,7 +87,7 @@ namespace WpfOxyPlotGraph.Repositories
 			cmd.Parameters.Add(new OracleParameter("p_visit_at", encounter.VisitAt));
 			cmd.Parameters.Add(new OracleParameter("p_diagnosis", encounter.Diagnosis));
 			cmd.Parameters.Add(new OracleParameter("p_notes", encounter.Notes));
-			cmd.ExecuteNonQuery();
+			cmd.ExecuteNonQueryTimed(tag: "api.encounter_update");
 		}
 	}
 }

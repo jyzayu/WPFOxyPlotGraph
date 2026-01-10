@@ -26,7 +26,7 @@ namespace WpfOxyPlotGraph.Repositories
 )";
             try
             {
-                cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQueryTimed(tag: "EnsureTables CREATE patients");
             }
             catch (OracleException ex) when (ex.Number == 955) { /* table already exists */ }
 
@@ -35,7 +35,7 @@ namespace WpfOxyPlotGraph.Repositories
             alter.CommandText = "ALTER TABLE patients MODIFY (name VARCHAR2(1024), rrn VARCHAR2(1024), address VARCHAR2(2048), contact VARCHAR2(512))";
             try
             {
-                alter.ExecuteNonQuery();
+                alter.ExecuteNonQueryTimed(tag: "EnsureTables ALTER patients columns");
             }
             catch (OracleException)
             {
@@ -46,7 +46,7 @@ namespace WpfOxyPlotGraph.Repositories
 			using (var addHash = connection.CreateCommand())
 			{
 				addHash.CommandText = "ALTER TABLE patients ADD (rrn_hash VARCHAR2(64))";
-				try { addHash.ExecuteNonQuery(); } catch (OracleException) { }
+				try { addHash.ExecuteNonQueryTimed(tag: "EnsureTables ADD rrn_hash"); } catch (OracleException) { }
 			}
 
 			// Backfill rrn_hash by decrypting rrn if needed
@@ -55,7 +55,7 @@ namespace WpfOxyPlotGraph.Repositories
 				selectAll.CommandText = "SELECT id, rrn, rrn_hash FROM patients";
 				try
 				{
-					using var reader = selectAll.ExecuteReader();
+					using var reader = selectAll.ExecuteReaderTimed(tag: "patients backfill selectAll");
 					var updates = new List<(int Id, string Hash)>();
 					while (reader.Read())
 					{
@@ -75,7 +75,7 @@ namespace WpfOxyPlotGraph.Repositories
 						up.CommandText = "UPDATE patients SET rrn_hash=:h WHERE id=:id";
 						up.Parameters.Add(new OracleParameter("h", item.Hash));
 						up.Parameters.Add(new OracleParameter("id", item.Id));
-						try { up.ExecuteNonQuery(); } catch (OracleException) { }
+						try { up.ExecuteNonQueryTimed(tag: "EnsureTables backfill rrn_hash"); } catch (OracleException) { }
 					}
 				}
 				catch (OracleException)
@@ -88,19 +88,19 @@ namespace WpfOxyPlotGraph.Repositories
 			using (var setNotNull = connection.CreateCommand())
 			{
 				setNotNull.CommandText = "ALTER TABLE patients MODIFY (rrn_hash VARCHAR2(64) NOT NULL)";
-				try { setNotNull.ExecuteNonQuery(); } catch (OracleException) { }
+				try { setNotNull.ExecuteNonQueryTimed(tag: "EnsureTables set NOT NULL rrn_hash"); } catch (OracleException) { }
 			}
 
 			// Drop old UNIQUE on rrn if present and add UNIQUE on rrn_hash
 			using (var dropOld = connection.CreateCommand())
 			{
 				dropOld.CommandText = "ALTER TABLE patients DROP CONSTRAINT uq_patients_rrn";
-				try { dropOld.ExecuteNonQuery(); } catch (OracleException) { }
+				try { dropOld.ExecuteNonQueryTimed(tag: "EnsureTables drop old unique"); } catch (OracleException) { }
 			}
 			using (var addNew = connection.CreateCommand())
 			{
 				addNew.CommandText = "ALTER TABLE patients ADD CONSTRAINT uq_patients_rrn_hash UNIQUE (rrn_hash)";
-				try { addNew.ExecuteNonQuery(); } catch (OracleException) { }
+				try { addNew.ExecuteNonQueryTimed(tag: "EnsureTables add unique rrn_hash"); } catch (OracleException) { }
 			}
         }
 
@@ -125,7 +125,7 @@ namespace WpfOxyPlotGraph.Repositories
             //cmd.ExecuteNonQuery();
             try
             {
-                cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQueryTimed(tag: "api.patient_insert");
             }
             catch (OracleException ex) when (ex.Number == 1)
             {
@@ -152,7 +152,7 @@ namespace WpfOxyPlotGraph.Repositories
 			cmd.BindByName = true;
 			cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
 
-			using var reader = cmd.ExecuteReader();
+			using var reader = cmd.ExecuteReaderTimed(tag: "api.patient_get_all");
             while (reader.Read())
             {
                 yield return new Patient
@@ -162,6 +162,57 @@ namespace WpfOxyPlotGraph.Repositories
                     ResidentRegistrationNumber = Crypto.DecryptStringLenient(reader.GetString(2), "patients.rrn"),
                     Address = Crypto.DecryptStringLenient(reader.GetString(3), "patients.address"),
                     Contact = Crypto.DecryptStringLenient(reader.GetString(4), "patients.contact"),
+                };
+            }
+        }
+
+        public IEnumerable<Patient> GetPage(int offset, int pageSize)
+        {
+            using var connection = DbConnectionFactory.CreateOpenConnection();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "api.patient_get_page";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.BindByName = true;
+            cmd.Parameters.Add(new OracleParameter("p_offset", offset));
+            cmd.Parameters.Add(new OracleParameter("p_page_size", pageSize));
+            cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.patient_get_page");
+            while (reader.Read())
+            {
+                yield return new Patient
+                {
+                    Id = reader.GetInt32(0),
+                    Name = Crypto.DecryptStringLenient(reader.GetString(1), "patients.name"),
+                    ResidentRegistrationNumber = Crypto.DecryptStringLenient(reader.GetString(2), "patients.rrn"),
+                    Address = Crypto.DecryptStringLenient(reader.GetString(3), "patients.address"),
+                    Contact = Crypto.DecryptStringLenient(reader.GetString(4), "patients.contact"),
+                };
+            }
+        }
+
+        // Lightweight page for list screens: fetch id,name only (less decryption)
+        public IEnumerable<Patient> GetPageLite(int offset, int pageSize)
+        {
+            using var connection = DbConnectionFactory.CreateOpenConnection();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "api.patient_get_page_min";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.BindByName = true;
+            cmd.Parameters.Add(new OracleParameter("p_offset", offset));
+            cmd.Parameters.Add(new OracleParameter("p_page_size", pageSize));
+            cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.patient_get_page_min");
+            while (reader.Read())
+            {
+                yield return new Patient
+                {
+                    Id = reader.GetInt32(0),
+                    Name = Crypto.DecryptStringLenient(reader.GetString(1), "patients.name"),
+                    ResidentRegistrationNumber = string.Empty,
+                    Address = string.Empty,
+                    Contact = string.Empty,
                 };
             }
         }
@@ -183,11 +234,62 @@ namespace WpfOxyPlotGraph.Repositories
 			cmd.Parameters.Add(new OracleParameter("p_contact", Crypto.EncryptString(patient.Contact, "patients.contact")));
             try
             {
-                cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQueryTimed(tag: "api.patient_update");
             }
             catch (OracleException ex) when (ex.Number == 1)
             {
                 throw new System.Exception("A patient with the same Resident Registration Number already exists.", ex);
+            }
+        }
+
+        public Patient? GetById(int id)
+        {
+            using var connection = DbConnectionFactory.CreateOpenConnection();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "api.patient_get_by_id";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.BindByName = true;
+            cmd.Parameters.Add(new OracleParameter("p_id", id));
+            cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.patient_get_by_id");
+            if (reader.Read())
+            {
+                return new Patient
+                {
+                    Id = reader.GetInt32(0),
+                    Name = Crypto.DecryptStringLenient(reader.GetString(1), "patients.name"),
+                    ResidentRegistrationNumber = Crypto.DecryptStringLenient(reader.GetString(2), "patients.rrn"),
+                    Address = Crypto.DecryptStringLenient(reader.GetString(3), "patients.address"),
+                    Contact = Crypto.DecryptStringLenient(reader.GetString(4), "patients.contact"),
+                };
+            }
+            return null;
+        }
+
+        public IEnumerable<Patient> GetPageLiteSearch(string? namePrefix, int offset, int pageSize)
+        {
+            using var connection = DbConnectionFactory.CreateOpenConnection();
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText = "api.patient_search_page_min";
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.BindByName = true;
+            cmd.Parameters.Add(new OracleParameter("p_name_prefix", namePrefix ?? string.Empty));
+            cmd.Parameters.Add(new OracleParameter("p_offset", offset));
+            cmd.Parameters.Add(new OracleParameter("p_page_size", pageSize));
+            cmd.Parameters.Add("p_cursor", OracleDbType.RefCursor, ParameterDirection.Output);
+
+            using var reader = cmd.ExecuteReaderTimed(tag: "api.patient_search_page_min");
+            while (reader.Read())
+            {
+                yield return new Patient
+                {
+                    Id = reader.GetInt32(0),
+                    Name = Crypto.DecryptStringLenient(reader.GetString(1), "patients.name"),
+                    ResidentRegistrationNumber = string.Empty,
+                    Address = string.Empty,
+                    Contact = string.Empty,
+                };
             }
         }
     }
