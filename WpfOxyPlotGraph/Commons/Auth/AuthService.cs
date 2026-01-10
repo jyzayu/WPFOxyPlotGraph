@@ -86,6 +86,39 @@ namespace WpfOxyPlotGraph.Commons.Auth
 			return true;
 		}
 
+		public void CreateOrUpdateUser(string username, string displayName, string password, Role roles)
+		{
+			if (string.IsNullOrWhiteSpace(username)) return;
+			if (string.IsNullOrWhiteSpace(password)) return;
+
+			var existing = _users.FirstOrDefault(u => string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase));
+			var salt = GenerateSalt();
+			var hash = ComputePasswordHashHex(username, password, salt);
+
+			if (existing == null)
+			{
+				var user = new UserRecord
+				{
+					Username = username,
+					DisplayName = string.IsNullOrWhiteSpace(displayName) ? username : displayName,
+					Roles = roles,
+					Salt = salt,
+					PasswordHashHex = hash,
+					CreatedAt = DateTimeOffset.Now
+				};
+				_users.Add(user);
+			}
+			else
+			{
+				existing.DisplayName = string.IsNullOrWhiteSpace(displayName) ? username : displayName;
+				existing.Roles = roles;
+				existing.Salt = salt;
+				existing.PasswordHashHex = hash;
+			}
+
+			Persist();
+		}
+
 		public void Logout()
 		{
 			var prev = CurrentUser?.Username ?? string.Empty;
