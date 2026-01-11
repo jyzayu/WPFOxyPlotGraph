@@ -97,8 +97,8 @@ namespace WpfOxyPlotGraph.ViewModels
 
         public AppointmentsViewModel()
         {
-            var allPatients = _patientRepository.GetAll().OrderBy(p => p.Id);
-            Patients = new ObservableCollection<Patient>(allPatients);
+            var firstPage = _patientRepository.GetPage(0, 50);
+            Patients = new ObservableCollection<Patient>(firstPage);
         }
 
         private void LoadAppointmentsForSelectedPatient()

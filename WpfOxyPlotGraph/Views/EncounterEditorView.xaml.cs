@@ -20,7 +20,7 @@ namespace WpfOxyPlotGraph.Views
 		private void OnAddAttachmentClick(object sender, RoutedEventArgs e)
 		{
 			if (Vm == null) return;
-			var dlg = new OpenFileDialog
+			var dlg = new Microsoft.Win32.OpenFileDialog
 			{
 				Filter = "이미지/PDF|*.png;*.jpg;*.jpeg;*.gif;*.pdf|모든 파일|*.*",
 				Multiselect = false
@@ -51,7 +51,7 @@ namespace WpfOxyPlotGraph.Views
 			if (Vm == null) return;
 			if (AttachmentsGrid.SelectedItem is EncounterAttachment a)
 			{
-				if (MessageBox.Show($"삭제하시겠습니까?\r\n{a.OriginalFileName}", "확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+				if (System.Windows.MessageBox.Show($"삭제하시겠습니까?\r\n{a.OriginalFileName}", "확인", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
 				{
 					if (Vm.DeleteAttachmentCommand.CanExecute(a.Id))
 					{

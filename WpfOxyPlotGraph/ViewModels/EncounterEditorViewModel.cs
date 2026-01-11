@@ -8,6 +8,7 @@ using WpfOxyPlotGraph.Commons.Printing;
 using WpfOxyPlotGraph.Models;
 using WpfOxyPlotGraph.Repositories;
 using WpfOxyPlotGraph.WpfBase;
+using System.Diagnostics;
 
 namespace WpfOxyPlotGraph.ViewModels
 {
@@ -33,10 +34,18 @@ namespace WpfOxyPlotGraph.ViewModels
 		private void LoadPatients()
 		{
 			Patients.Clear();
-			foreach (var p in _patientRepo.GetAll())
+			var swRepo = Stopwatch.StartNew();
+            var list =	_patientRepo.GetPageLite(0, 10).ToList();
+			swRepo.Stop();
+			Trace.WriteLine($"[UI] Patients(repo) enumerate {swRepo.ElapsedMilliseconds} ms (rows={list.Count})");
+
+			var swUi = Stopwatch.StartNew();
+			foreach (var p in list)
 			{
 				Patients.Add(p);
 			}
+			swUi.Stop();
+			Trace.WriteLine($"[UI] Patients(collection) populate {swUi.ElapsedMilliseconds} ms");
 		}
 
 		private Patient _selectedPatient;
@@ -81,7 +90,15 @@ namespace WpfOxyPlotGraph.ViewModels
 		{
 			Encounters.Clear();
 			if (SelectedPatient == null) return;
-			foreach (var e in _encounterRepo.GetByPatientId(SelectedPatient.Id)) Encounters.Add(e);
+			var swRepo = Stopwatch.StartNew();
+			var list = _encounterRepo.GetByPatientIdPage(SelectedPatient.Id, 0, 100).ToList();
+			swRepo.Stop();
+			Trace.WriteLine($"[UI] Encounters(repo) enumerate {swRepo.ElapsedMilliseconds} ms (rows={list.Count})");
+
+			var swUi = Stopwatch.StartNew();
+			foreach (var e in list) Encounters.Add(e);
+			swUi.Stop();
+			Trace.WriteLine($"[UI] Encounters(collection) populate {swUi.ElapsedMilliseconds} ms");
 		}
 
 		private void NewEncounter()

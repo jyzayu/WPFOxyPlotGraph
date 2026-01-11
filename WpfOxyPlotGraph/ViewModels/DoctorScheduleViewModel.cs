@@ -97,7 +97,7 @@ namespace WpfOxyPlotGraph.ViewModels
         private void LoadPatients()
         {
             Patients.Clear();
-            foreach (var p in _patientRepository.GetAll().OrderBy(p => p.Id))
+            foreach (var p in _patientRepository.GetPage(0, 50))
             {
                 Patients.Add(p);
             }
